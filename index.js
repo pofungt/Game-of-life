@@ -1,5 +1,6 @@
 const unitLength  = 20;
-const boxColor    = 150;
+const boxColor    = '#312E16';
+const emptyboxColor = '#997B3D';
 const strokeColor = 50;
 let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
@@ -27,7 +28,7 @@ const shapes = {
 
 function setup() {
 	/* Set the canvas to be under the element #canvas*/
-	const canvas = createCanvas(windowWidth, windowHeight - 100);
+	const canvas = createCanvas(windowWidth - 20, windowHeight - 200);
 	canvas.parent(document.querySelector('#canvas'));
 
 	/*Calculate the number of columns and rows */
@@ -64,14 +65,14 @@ function init_random() {
 }
 
 function draw() {
-    background(255);
+    background(emptyboxColor);
     generate();
     for (let i = 0; i < columns; i++) {
         for (let j = 0; j < rows; j++) {
             if (currentBoard[i][j] == 1){
-                fill(boxColor);  
+                fill(red(boxColor), green(boxColor), blue(boxColor));  
             } else {
-                fill(255);
+                fill(red(emptyboxColor), green(emptyboxColor), blue(emptyboxColor));
             } 
             stroke(strokeColor);
             rect(i * unitLength, j * unitLength, unitLength, unitLength);
