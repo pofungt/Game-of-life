@@ -6,26 +6,26 @@ let rows;    /* To be determined by window height */
 let currentBoard;
 let nextBoard;
 
-function  init() {
-	for (let i = 0; i < columns; i++) {
-		for (let j = 0; j < rows; j++) {
-			currentBoard[i][j] = 0;
-			nextBoard[i][j] = 0;
-		}
-	}
+const shapes = {
+    ship: [
+        [0, 1, 1],
+        [1, 0, 1],
+        [1, 1, 0]
+    ],
+    glider: [
+        [1, 1, 1],
+        [1, 0, 0],
+        [0, 1, 0]
+    ],
+    spaceship: [
+        [0, 1, 0, 0, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 0]
+    ]
 }
 
-function init_random() {
-    for (let i = 0; i < columns; i++) {
-		for (let j = 0; j < rows; j++) {
-            currentBoard[i][j] = random() > 0.8 ? 1 : 0;
-            nextBoard[i][j] = 0;
-		}
-	}
-
-}
-
-function setup(){
+function setup() {
 	/* Set the canvas to be under the element #canvas*/
 	const canvas = createCanvas(windowWidth, windowHeight - 100);
 	canvas.parent(document.querySelector('#canvas'));
@@ -43,6 +43,24 @@ function setup(){
     }
 	// Now both currentBoard and nextBoard are array of array of undefined values.
 	init();  // Set the initial values of the currentBoard and nextBoard
+}
+
+function init() {
+	for (let i = 0; i < columns; i++) {
+		for (let j = 0; j < rows; j++) {
+			currentBoard[i][j] = 0;
+			nextBoard[i][j] = 0;
+		}
+	}
+}
+
+function init_random() {
+    for (let i = 0; i < columns; i++) {
+		for (let j = 0; j < rows; j++) {
+            currentBoard[i][j] = random() > 0.8 ? 1 : 0;
+            nextBoard[i][j] = 0;
+		}
+	}
 }
 
 function draw() {
@@ -123,13 +141,66 @@ function mouseReleased() {
     loop();
 }
 
+function add_icon() {
+            /**
+     * If the mouse coordinate is outside the board
+     */
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+        return;
+    }
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    for (let i = 0; i < shapes[shape].length; i++) {
+        for (let j = 0; j < shapes[shape][i].length; j++) {
+            currentBoard[x + i][y + j] = shapes[shape][i][j];
+        }
+    }
+
+    fill(boxColor);
+    stroke(strokeColor);
+    rect(x * unitLength, y * unitLength, unitLength, unitLength);
+}
+
 document.querySelector('#reset-game')
 	.addEventListener('click', function() {
 		init();
 	});
 
 document.querySelector('#reset-game-random')
-.addEventListener('click', function() {
-    init_random();
+    .addEventListener('click', function() {
+        init_random();
+    });
+
+let shape;
+
+const ship = document.querySelector('#ship');
+ship.addEventListener('click', function() {
+    document.querySelector('#add_icons')
+        .innerHTML = ship.innerHTML;
+    shape = ship.innerHTML.toLowerCase();
+    window.addEventListener('click', add_icon);
 });
 
+const glider = document.querySelector('#glider');
+glider.addEventListener('click', function() {
+    document.querySelector('#add_icons')
+        .innerHTML = glider.innerHTML;
+    shape = glider.innerHTML.toLowerCase();
+    window.addEventListener('click', add_icon);
+});
+
+const spaceship = document.querySelector('#spaceship');
+spaceship.addEventListener('click', function() {
+    document.querySelector('#add_icons')
+        .innerHTML = spaceship.innerHTML;
+    shape = spaceship.innerHTML.toLowerCase();
+    window.addEventListener('click', add_icon);
+});
+
+const reset = document.querySelector('#reset_button');
+reset.addEventListener('click', function() {
+    document.querySelector('#add_icons')
+        .innerHTML = "Add";
+    shape = null;
+    window.removeEventListener('click', add_icon);
+});
