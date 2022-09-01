@@ -24,11 +24,33 @@
                 <img src="./asset/pause-button.png">
             </button>
         </div>
-        <div id="reset_blcok" class="button_block">
+        <div id="rules_block" class="vertical button_block">
+            <div id="rules_input" class="inside button_block">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="">B</span>
+                    </div>
+                    <input id="B1" type="text" class="form-control" maxlength="1" value="3">
+                    <input id="B2" type="text" class="form-control" maxlength="1">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="">S</span>
+                    </div>
+                    <input id="S1" type="text" class="form-control" maxlength="1" value="2">
+                    <input id="S2" type="text" class="form-control" maxlength="1" value="3">
+                </div>
+            </div>
+            <div id="rules_button" class="inside button_block">
+                <button id="submit-rules" type="button" class="btn btn-secondary">Submit</button>
+                <button id="reset-rules" type="button" class="btn btn-secondary">Reset</button>
+            </div>
+        </div>
+        <div id="reset_block" class=" vertical button_block">
             <button id="reset-game" type="button" class="btn btn-secondary">Blank</button>
             <button id="reset-game-random" type="button" class="btn btn-secondary">Random</button>
         </div>
-        <div id="add_block" class="button_block">
+        <div id="add_block" class="vertical button_block">
             <div class="dropdown">
                 <button id="add_icons" class="btn btn-secondary dropdown-toggle" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">

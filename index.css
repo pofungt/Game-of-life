@@ -57,6 +57,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgb(208, 143, 83, .2);
 }
 
 .block {
@@ -87,4 +88,32 @@ body {
 
 .btn img {
     width: 20px;
+}
+
+#B1,#B2,#S1,#S2 {
+    width: 30px;
+    font-size: 10px;
+    padding: 0 5px;
+}
+
+#rules_block .input-group-text {
+    font-size: 10px;
+}
+
+.vertical {
+    flex-direction: column;
+}
+
+.inside {
+    background-color: transparent;
+}
+
+#rules_input {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#rules_button {
+    margin-top: 0;
+    padding-top: 0;
 }
