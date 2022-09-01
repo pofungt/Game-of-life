@@ -2,6 +2,7 @@ const unitLength  = 20;
 const boxColor    = '#312E16';
 const emptyboxColor = '#997B3D';
 const strokeColor = 50;
+let fr = 30;
 let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
 let currentBoard;
@@ -66,6 +67,7 @@ function init_random() {
 
 function draw() {
     background(emptyboxColor);
+    frameRate(fr);
     generate();
     for (let i = 0; i < columns; i++) {
         for (let j = 0; j < rows; j++) {
@@ -153,7 +155,7 @@ function add_icon() {
     const y = Math.floor(mouseY / unitLength);
     for (let i = 0; i < shapes[shape].length; i++) {
         for (let j = 0; j < shapes[shape][i].length; j++) {
-            currentBoard[x + i][y + j] = shapes[shape][i][j];
+            currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j];
         }
     }
 
@@ -179,7 +181,9 @@ ship.addEventListener('click', function() {
     document.querySelector('#add_icons')
         .innerHTML = ship.innerHTML;
     shape = ship.innerHTML.toLowerCase();
-    window.addEventListener('click', add_icon);
+    setTimeout(() => {
+        window.addEventListener('click', add_icon);
+    }, 500);
 });
 
 const glider = document.querySelector('#glider');
@@ -187,7 +191,9 @@ glider.addEventListener('click', function() {
     document.querySelector('#add_icons')
         .innerHTML = glider.innerHTML;
     shape = glider.innerHTML.toLowerCase();
-    window.addEventListener('click', add_icon);
+    setTimeout(() => {
+        window.addEventListener('click', add_icon);
+    }, 500);
 });
 
 const spaceship = document.querySelector('#spaceship');
@@ -195,7 +201,9 @@ spaceship.addEventListener('click', function() {
     document.querySelector('#add_icons')
         .innerHTML = spaceship.innerHTML;
     shape = spaceship.innerHTML.toLowerCase();
-    window.addEventListener('click', add_icon);
+    setTimeout(() => {
+        window.addEventListener('click', add_icon);
+    }, 500);
 });
 
 const reset = document.querySelector('#reset_button');
@@ -204,4 +212,12 @@ reset.addEventListener('click', function() {
         .innerHTML = "Add";
     shape = null;
     window.removeEventListener('click', add_icon);
+});
+
+const slide_speed = [10, 30, 60];
+const slide_speed_output = ['LOW', 'MED', 'HIGH'];
+const slide = document.querySelector('#framerate_slider');
+slide.addEventListener('change', function() {
+    fr = slide_speed[parseInt(slide.value)];
+    document.querySelector('#framerate_output').innerHTML = slide_speed_output[parseInt(slide.value)];
 });
