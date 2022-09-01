@@ -85,3 +85,7 @@ body {
     font-size: 10px;
     margin: 0 0 5px;
 }
+
+.btn img {
+    width: 20px;
+}

@@ -121,12 +121,6 @@ function generate() {
 }
 
  function mouseDragged() {
-    /**
-     * If the mouse coordinate is outside the board
-     */
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
-        return;
-    }
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     currentBoard[x][y] = 1;
@@ -136,16 +130,23 @@ function generate() {
 }
 
 function mousePressed() {
-    noLoop();
-    mouseDragged();
+    /**
+     * If the mouse coordinate is outside the board
+     */
+    if (!(mouseX > unitLength * columns || mouseY > unitLength * rows)) {
+        noLoop();
+        mouseDragged();
+    }
 }
 
 function mouseReleased() {
-    loop();
+    if (!(mouseX > unitLength * columns || mouseY > unitLength * rows)) {
+        loop();
+    }
 }
 
 function add_icon() {
-            /**
+    /**
      * If the mouse coordinate is outside the board
      */
     if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
@@ -221,3 +222,15 @@ slide.addEventListener('change', function() {
     fr = slide_speed[parseInt(slide.value)];
     document.querySelector('#framerate_output').innerHTML = slide_speed_output[parseInt(slide.value)];
 });
+
+const next_button_pic = ["./asset/pause-button.png", "./asset/play-button.png"];
+const play_pause = document.querySelector('#play_pause');
+play_pause.addEventListener('click', function() {
+    if (isLooping()) {
+        document.querySelector('#play_pause img').src = next_button_pic[1];
+        noLoop();
+    } else {
+        document.querySelector('#play_pause img').src = next_button_pic[0];
+        loop();
+    }
+})
