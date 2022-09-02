@@ -12,7 +12,7 @@ const slide_speed = {
     small: [1, 5, 10]
 };
 let fr = slide_speed[square_size][1];
-let b = [3, 0];
+let b = [3, NaN];
 let s = [2, 3];
 let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
@@ -111,14 +111,11 @@ function generate() {
             }
 
             // Rules of Life
-            if (currentBoard[x][y] == 1 && neighbors < 2) {
-                // Die of Loneliness
+            if (currentBoard[x][y] == 1 && !s.includes(neighbors)) {
+                // Die case
                 nextBoard[x][y] = 0;
-            } else if (currentBoard[x][y] == 1 && neighbors > 3) {
-                // Die of Overpopulation
-                nextBoard[x][y] = 0;
-            } else if (currentBoard[x][y] == 0 && neighbors == 3) {
-                // New life due to Reproduction
+            } else if (currentBoard[x][y] == 0 && b.includes(neighbors)) {
+                // Reproduction case
                 nextBoard[x][y] = 1;
             } else {
                 // Stasis
@@ -301,9 +298,13 @@ rules_submit.addEventListener('click', () => {
 });
 
 // When rules reset button is clicked
-const rules_reset = document.querySelector('#reset_rules');
+const rules_reset = document.querySelector('#reset-rules');
 rules_reset.addEventListener('click', () => {
-    b = [3, 0];
+    b = [3, NaN];
     s = [2, 3];
+    B0.value = '3';
+    B1.value = '';   
+    S0.value = '2';
+    S1.value = '3';  
 });
 
