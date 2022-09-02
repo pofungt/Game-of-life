@@ -21,11 +21,13 @@ body {
 .title {
     font-size: 30px;
     padding: 5px 0 5px;
+    -webkit-text-stroke: 2px black;
 }
 
 .subtitle {
     color: #997B3D;
     font-size: 10px;
+    -webkit-text-stroke: 2px black;
 }
 
 .content {
@@ -91,7 +93,7 @@ body {
     width: 20px;
 }
 
-#B1,#B2,#S1,#S2 {
+#B0,#B1,#S0,#S1 {
     width: 30px;
     font-size: 10px;
     padding: 0 5px;

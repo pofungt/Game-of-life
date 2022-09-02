@@ -12,6 +12,8 @@ const slide_speed = {
     small: [1, 5, 10]
 };
 let fr = slide_speed[square_size][1];
+let b = [3, 0];
+let s = [2, 3];
 let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
 let currentBoard;
@@ -189,20 +191,20 @@ function restart() {
 }
 
 document.querySelector('#reset-game')
-	.addEventListener('click', function() {
+	.addEventListener('click', () => {
 		init();
         restart();
 	});
 
 document.querySelector('#reset-game-random')
-    .addEventListener('click', function() {
+    .addEventListener('click', () => {
         init_random();
         restart();
     });
 
 let shape;
 const ship = document.querySelector('#ship');
-ship.addEventListener('click', function() {
+ship.addEventListener('click', () => {
     document.querySelector('#add_icons')
         .innerHTML = ship.innerHTML;
     shape = ship.innerHTML.toLowerCase();
@@ -212,7 +214,7 @@ ship.addEventListener('click', function() {
 });
 
 const glider = document.querySelector('#glider');
-glider.addEventListener('click', function() {
+glider.addEventListener('click', () => {
     document.querySelector('#add_icons')
         .innerHTML = glider.innerHTML;
     shape = glider.innerHTML.toLowerCase();
@@ -222,7 +224,7 @@ glider.addEventListener('click', function() {
 });
 
 const spaceship = document.querySelector('#spaceship');
-spaceship.addEventListener('click', function() {
+spaceship.addEventListener('click', () => {
     document.querySelector('#add_icons')
         .innerHTML = spaceship.innerHTML;
     shape = spaceship.innerHTML.toLowerCase();
@@ -232,7 +234,7 @@ spaceship.addEventListener('click', function() {
 });
 
 const reset_icon = document.querySelector('#reset_button');
-reset_icon.addEventListener('click', function() {
+reset_icon.addEventListener('click', () => {
     document.querySelector('#add_icons')
         .innerHTML = "Add";
     shape = null;
@@ -241,14 +243,14 @@ reset_icon.addEventListener('click', function() {
 
 const slide_speed_output = ['LOW', 'MED', 'HIGH'];
 const slide = document.querySelector('#framerate_slider');
-slide.addEventListener('change', function() {
+slide.addEventListener('change', () => {
     fr = slide_speed[square_size][parseInt(slide.value)];
     document.querySelector('#framerate_output').innerHTML = slide_speed_output[parseInt(slide.value)];
 });
 
 const next_button_pic = ["./asset/pause-button.png", "./asset/play-button.png"];
 const play_pause = document.querySelector('#play_pause');
-play_pause.addEventListener('click', function() {
+play_pause.addEventListener('click', () => {
     if (isLooping()) {
         document.querySelector('#play_pause img').src = next_button_pic[1];
         noLoop();
@@ -256,10 +258,10 @@ play_pause.addEventListener('click', function() {
         document.querySelector('#play_pause img').src = next_button_pic[0];
         loop();
     }
-})
+});
 
 const size_checkbox = document.querySelector("#size_block #flexSwitchCheckChecked");
-size_checkbox.addEventListener('change', function() {
+size_checkbox.addEventListener('change', () => {
   if (this.checked) {
     square_size = "big";
     unitLength  = unitLengthObj[square_size];
@@ -275,14 +277,33 @@ size_checkbox.addEventListener('change', function() {
     }
 });
 
+// When draw is clicked, either to enable or disable drawing
 let draw_bool = false;
 const draw_pen = document.querySelector('#draw_pen');
-draw_pen.addEventListener('click', function() {
+draw_pen.addEventListener('click', () => {
     if (!draw_bool) {
         draw_pen.style.background = "radial-gradient(#382D17, #9e7f3f)";
     } else {
         draw_pen.removeAttribute('style');
     }
     draw_bool = !draw_bool;
-})
+});
+
+// When new rules are submitted
+const B0 = document.querySelector('#B0');
+const B1 = document.querySelector('#B1');
+const S0 = document.querySelector('#S0');
+const S1 = document.querySelector('#S1');
+const rules_submit = document.querySelector('#submit-rules');
+rules_submit.addEventListener('click', () => {
+    b = [parseInt(B0.value), parseInt(B1.value)];
+    s = [parseInt(S0.value), parseInt(S1.value)];
+});
+
+// When rules reset button is clicked
+const rules_reset = document.querySelector('#reset_rules');
+rules_reset.addEventListener('click', () => {
+    b = [3, 0];
+    s = [2, 3];
+});
 
