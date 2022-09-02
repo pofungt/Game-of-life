@@ -141,20 +141,12 @@ function generate() {
 
 function mousePressed() {
     if (draw_bool) {
-        noLoop();
-        mouseDragged();
-    }
-}
-
-function mouseReleased() {
-    if (draw_bool) {
-        if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
-            return;
-        } else {
-            draw_bool = false;
-            draw_pen.removeAttribute('style');
-            loop();
-        }
+        const x = Math.floor(mouseX / unitLength);
+        const y = Math.floor(mouseY / unitLength);
+        currentBoard[x][y] = 1;
+        fill(boxColor);
+        stroke(strokeColor);
+        rect(x * unitLength, y * unitLength, unitLength, unitLength);
     }
 }
 
@@ -180,9 +172,17 @@ function add_icon() {
     restart();
 }
 
+function pause() {
+    if (isLooping()) {
+        document.querySelector('#play_pause img').src = next_button_pic[1];
+        noLoop();
+    }
+}
+
 function restart() {
     if (!isLooping()) {
         document.querySelector('#play_pause img').src = next_button_pic[0];
+        draw_pen.removeAttribute('style');
         loop();
     }    
 }
@@ -249,11 +249,9 @@ const next_button_pic = ["./asset/pause-button.png", "./asset/play-button.png"];
 const play_pause = document.querySelector('#play_pause');
 play_pause.addEventListener('click', () => {
     if (isLooping()) {
-        document.querySelector('#play_pause img').src = next_button_pic[1];
-        noLoop();
+        pause();
     } else {
-        document.querySelector('#play_pause img').src = next_button_pic[0];
-        loop();
+        restart();
     }
 });
 
@@ -280,8 +278,9 @@ const draw_pen = document.querySelector('#draw_pen');
 draw_pen.addEventListener('click', () => {
     if (!draw_bool) {
         draw_pen.style.background = "radial-gradient(#382D17, #9e7f3f)";
+        pause();
     } else {
-        draw_pen.removeAttribute('style');
+        restart();
     }
     draw_bool = !draw_bool;
 });
