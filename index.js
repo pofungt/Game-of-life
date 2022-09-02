@@ -20,17 +20,17 @@ let currentBoard;
 let nextBoard;
 
 const shapes = {
-    ship: [
+    Ship: [
         [0, 1, 1],
         [1, 0, 1],
         [1, 1, 0]
     ],
-    glider: [
+    Glider: [
         [1, 1, 1],
         [1, 0, 0],
         [0, 1, 0]
     ],
-    spaceship: [
+    Spaceship: [
         [0, 1, 0, 0, 1],
         [1, 0, 0, 0, 0],
         [1, 0, 0, 0, 1],
@@ -199,16 +199,27 @@ document.querySelector('#reset-game-random')
         restart();
     });
 
+// Add list items to add_icon bar
+for (list_name in shapes) {
+    document.querySelector('#add_block .dropdown-menu').innerHTML
+        += `<li><a id="${list_name}" class="dropdown-item" href="#">${list_name}</a></li>`;
+}
+
 let shape;
+let add_icon_counter = 0;
 const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
 for (let add_shape of add_shapes) {
     add_shape.addEventListener('click', () => {
+        if (add_icon_counter > 0) {
+            window.removeEventListener('click', add_icon);
+        }
         document.querySelector('#add_icons')
         .innerHTML = add_shape.innerHTML;
         shape = add_shape.id;
         setTimeout(() => {
             window.addEventListener('click', add_icon);
-        }, 500);
+        }, 10);
+        add_icon_counter++;
     });
 };
 
@@ -217,6 +228,7 @@ reset_icon.addEventListener('click', () => {
     document.querySelector('#add_icons')
         .innerHTML = "Add";
     shape = null;
+    add_icon_counter = 0;
     window.removeEventListener('click', add_icon);
 });
 
