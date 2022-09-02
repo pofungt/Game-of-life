@@ -1,8 +1,17 @@
-const unitLength  = 20;
+const unitLengthObj = {
+    big: 20,
+    small: 10
+};
+let square_size = "big";
+let unitLength  = unitLengthObj[square_size];
 const boxColor    = '#312E16';
 const emptyboxColor = '#997B3D';
 const strokeColor = 50;
-let fr = 30;
+const slide_speed = {
+    big: [5, 15, 30],
+    small: [1, 5, 10]
+};
+let fr = slide_speed[square_size][1];
 let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
 let currentBoard;
@@ -121,27 +130,32 @@ function generate() {
 }
 
  function mouseDragged() {
-    const x = Math.floor(mouseX / unitLength);
-    const y = Math.floor(mouseY / unitLength);
-    currentBoard[x][y] = 1;
-    fill(boxColor);
-    stroke(strokeColor);
-    rect(x * unitLength, y * unitLength, unitLength, unitLength);
+    if (draw_bool) {
+        const x = Math.floor(mouseX / unitLength);
+        const y = Math.floor(mouseY / unitLength);
+        currentBoard[x][y] = 1;
+        fill(boxColor);
+        stroke(strokeColor);
+        rect(x * unitLength, y * unitLength, unitLength, unitLength);
+    }
 }
 
 function mousePressed() {
-    /**
-     * If the mouse coordinate is outside the board
-     */
-    if (!(mouseX > unitLength * columns || mouseY > unitLength * rows)) {
+    if (draw_bool) {
         noLoop();
         mouseDragged();
     }
 }
 
 function mouseReleased() {
-    if (!(mouseX > unitLength * columns || mouseY > unitLength * rows)) {
-        loop();
+    if (draw_bool) {
+        if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+            return;
+        } else {
+            draw_bool = false;
+            draw_pen.removeAttribute('style');
+            loop();
+        }
     }
 }
 
@@ -163,20 +177,30 @@ function add_icon() {
     fill(boxColor);
     stroke(strokeColor);
     rect(x * unitLength, y * unitLength, unitLength, unitLength);
+
+    restart();
+}
+
+function restart() {
+    if (!isLooping()) {
+        document.querySelector('#play_pause img').src = next_button_pic[0];
+        loop();
+    }    
 }
 
 document.querySelector('#reset-game')
 	.addEventListener('click', function() {
 		init();
+        restart();
 	});
 
 document.querySelector('#reset-game-random')
     .addEventListener('click', function() {
         init_random();
+        restart();
     });
 
 let shape;
-
 const ship = document.querySelector('#ship');
 ship.addEventListener('click', function() {
     document.querySelector('#add_icons')
@@ -207,19 +231,18 @@ spaceship.addEventListener('click', function() {
     }, 500);
 });
 
-const reset = document.querySelector('#reset_button');
-reset.addEventListener('click', function() {
+const reset_icon = document.querySelector('#reset_button');
+reset_icon.addEventListener('click', function() {
     document.querySelector('#add_icons')
         .innerHTML = "Add";
     shape = null;
     window.removeEventListener('click', add_icon);
 });
 
-const slide_speed = [10, 30, 60];
 const slide_speed_output = ['LOW', 'MED', 'HIGH'];
 const slide = document.querySelector('#framerate_slider');
 slide.addEventListener('change', function() {
-    fr = slide_speed[parseInt(slide.value)];
+    fr = slide_speed[square_size][parseInt(slide.value)];
     document.querySelector('#framerate_output').innerHTML = slide_speed_output[parseInt(slide.value)];
 });
 
@@ -234,3 +257,32 @@ play_pause.addEventListener('click', function() {
         loop();
     }
 })
+
+const size_checkbox = document.querySelector("#size_block #flexSwitchCheckChecked");
+size_checkbox.addEventListener('change', function() {
+  if (this.checked) {
+    square_size = "big";
+    unitLength  = unitLengthObj[square_size];
+    document.querySelector('#size_block label').innerHTML = "Big";
+    setup();
+    restart();
+  } else {
+    square_size = "small";
+    unitLength  = unitLengthObj[square_size];
+    document.querySelector('#size_block label').innerHTML = "Small";
+    setup();
+    restart();
+    }
+});
+
+let draw_bool = false;
+const draw_pen = document.querySelector('#draw_pen');
+draw_pen.addEventListener('click', function() {
+    if (!draw_bool) {
+        draw_pen.style.background = "radial-gradient(#382D17, #9e7f3f)";
+    } else {
+        draw_pen.removeAttribute('style');
+    }
+    draw_bool = !draw_bool;
+})
+

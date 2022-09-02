@@ -24,6 +24,11 @@
                 <img src="./asset/pause-button.png">
             </button>
         </div>
+        <div id="draw_block" class="button_block">
+            <button id="draw_pen" type="button" class="btn btn-secondary">
+                <img src="./asset/pen.png">
+            </button>
+        </div>
         <div id="rules_block" class="vertical button_block">
             <div id="rules_input" class="inside button_block">
                 <div class="input-group">
@@ -64,9 +69,16 @@
             </div>
             <button id="reset_button" type="button" class="btn btn-secondary">Reset</button>
         </div>
-        <div id="framerate_block" class="button_block">
-            <output id="framerate_output">MED</output>
-            <input type="range" class="form-range" value="1" min="0" max="2" step="1" id="framerate_slider">
+        <div id="framerate_block" class="vertical button_block">
+            <output id="framerate_output" class="form_label switch_bar">MED</output>
+            <input type="range" class="form-range switch_bar" value="1" min="0" max="2" step="1" id="framerate_slider">
+        </div>
+
+        <div id="size_block" class="vertical button_block">
+            <label class="form-check-label switch_bar form_label" for="flexSwitchCheckChecked">Big</label>
+            <div class="form-check form-switch switch_bar">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+            </div>
         </div>
     </div>
 
