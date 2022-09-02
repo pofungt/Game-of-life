@@ -200,35 +200,17 @@ document.querySelector('#reset-game-random')
     });
 
 let shape;
-const ship = document.querySelector('#ship');
-ship.addEventListener('click', () => {
-    document.querySelector('#add_icons')
-        .innerHTML = ship.innerHTML;
-    shape = ship.innerHTML.toLowerCase();
-    setTimeout(() => {
-        window.addEventListener('click', add_icon);
-    }, 500);
-});
-
-const glider = document.querySelector('#glider');
-glider.addEventListener('click', () => {
-    document.querySelector('#add_icons')
-        .innerHTML = glider.innerHTML;
-    shape = glider.innerHTML.toLowerCase();
-    setTimeout(() => {
-        window.addEventListener('click', add_icon);
-    }, 500);
-});
-
-const spaceship = document.querySelector('#spaceship');
-spaceship.addEventListener('click', () => {
-    document.querySelector('#add_icons')
-        .innerHTML = spaceship.innerHTML;
-    shape = spaceship.innerHTML.toLowerCase();
-    setTimeout(() => {
-        window.addEventListener('click', add_icon);
-    }, 500);
-});
+const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
+for (let add_shape of add_shapes) {
+    add_shape.addEventListener('click', () => {
+        document.querySelector('#add_icons')
+        .innerHTML = add_shape.innerHTML;
+        shape = add_shape.id;
+        setTimeout(() => {
+            window.addEventListener('click', add_icon);
+        }, 500);
+    });
+};
 
 const reset_icon = document.querySelector('#reset_button');
 reset_icon.addEventListener('click', () => {
