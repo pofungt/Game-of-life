@@ -259,7 +259,7 @@ play_pause.addEventListener('click', () => {
 
 const size_checkbox = document.querySelector("#size_block #flexSwitchCheckChecked");
 size_checkbox.addEventListener('change', () => {
-  if (this.checked) {
+  if (size_checkbox.checked) {
     square_size = "big";
     unitLength  = unitLengthObj[square_size];
     document.querySelector('#size_block label').innerHTML = "Big";
