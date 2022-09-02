@@ -35,6 +35,12 @@ const shapes = {
         [1, 0, 0, 0, 0],
         [1, 0, 0, 0, 1],
         [1, 1, 1, 1, 0]
+    ],
+    Toad: [
+        [0, 0, 1, 0],
+        [1, 0, 0, 1],
+        [1, 0, 0, 1],
+        [0, 1, 0, 0]
     ]
 }
 
@@ -168,8 +174,9 @@ function add_icon() {
     fill(boxColor);
     stroke(strokeColor);
     rect(x * unitLength, y * unitLength, unitLength, unitLength);
-
-    restart();
+    if (!draw_bool) {
+        restart();
+    }
 }
 
 function pause() {
@@ -183,6 +190,7 @@ function restart() {
     if (!isLooping()) {
         document.querySelector('#play_pause img').src = next_button_pic[0];
         draw_pen.removeAttribute('style');
+        draw_bool = false;
         loop();
     }    
 }
