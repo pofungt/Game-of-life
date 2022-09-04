@@ -4,7 +4,8 @@ const unitLengthObj = {
 };
 let square_size = "big";
 let unitLength  = unitLengthObj[square_size];
-const boxColor    = '#312E16';
+const boxColor = '#312E16';
+const boxColor_blue = '#3D5B99';
 const emptyboxColor = '#997B3D';
 const strokeColor = 50;
 const slide_speed = {
@@ -18,6 +19,7 @@ let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
 let currentBoard;
 let nextBoard;
+let mono = false;
 
 const shapes = {
     Ship: [
@@ -74,6 +76,14 @@ function init() {
 }
 
 function init_random() {
+    if (mono) {
+        init_random_mono();
+    } else {
+        init_random_color();
+    }
+}
+
+function init_random_mono() {
     for (let i = 0; i < columns; i++) {
 		for (let j = 0; j < rows; j++) {
             currentBoard[i][j] = random() > 0.8 ? 1 : 0;
@@ -82,10 +92,29 @@ function init_random() {
 	}
 }
 
+function init_random_color() {
+    for (let i = 0; i < columns; i++) {
+		for (let j = 0; j < rows; j++) {
+            currentBoard[i][j] = random() > 0.8 ? (random() > 0.5 ? "brown" : "blue") : 0;
+            nextBoard[i][j] = 0;
+		}
+	}
+}
+
 function draw() {
     background(emptyboxColor);
     frameRate(fr);
-    generate();
+
+    if (mono) {
+        generate_mono();
+        draw_mono();
+    } else {
+        generate_color();
+        draw_color();
+    }
+}
+
+function draw_mono() {
     for (let i = 0; i < columns; i++) {
         for (let j = 0; j < rows; j++) {
             if (currentBoard[i][j] == 1){
@@ -99,7 +128,23 @@ function draw() {
     }
 }
 
-function generate() {
+function draw_color() {
+    for (let i = 0; i < columns; i++) {
+        for (let j = 0; j < rows; j++) {
+            if (currentBoard[i][j] == "brown"){
+                fill(red(boxColor), green(boxColor), blue(boxColor));  
+            } else if (currentBoard[i][j] == "blue") {
+                fill(red(boxColor_blue), green(boxColor_blue), blue(boxColor_blue));
+            } else {
+                fill(red(emptyboxColor), green(emptyboxColor), blue(emptyboxColor));
+            }
+            stroke(strokeColor);
+            rect(i * unitLength, j * unitLength, unitLength, unitLength);
+        }
+    }
+}
+
+function generate_mono() {
     //Loop over every single box on the board
     for (let x = 0; x < columns; x++) {
         for (let y = 0; y < rows; y++) {
@@ -132,6 +177,72 @@ function generate() {
 
     // Swap the nextBoard to be the current Board
     [currentBoard, nextBoard] = [nextBoard, currentBoard];
+}
+
+function generate_color() {
+        //Loop over every single box on the board
+        for (let x = 0; x < columns; x++) {
+            for (let y = 0; y < rows; y++) {
+                // Count all living members in the Moore neighborhood(8 boxes surrounding)
+                let neighbors = {
+                    brown: 0,
+                    blue: 0
+                };
+                for (let i of [-1, 0, 1]) {
+                    for (let j of [-1, 0, 1]) {
+                        if( i == 0 && j == 0 ){
+                            // the cell itself is not its own neighbor
+                            continue;
+                        }
+                        // The modulo operator is crucial for wrapping on the edge
+                        let neighbor_color = currentBoard[(x + i + columns) % columns][(y + j + rows) % rows];
+                        if (neighbor_color !== 0) {
+                            neighbors[neighbor_color]++;
+                        }
+                    }
+                }
+                
+                // Calculate number of neighbors irrespective of colors
+                const neighbors_values = Object.values(neighbors);
+                const num_of_neighbors = neighbors_values.reduce((acc, value) => {
+                    return acc + value;
+                }, 0);
+
+                // Rules of Life
+                if (currentBoard[x][y] !== 0) {
+                    if (!s.includes(num_of_neighbors)) {
+                        // Die case
+                        nextBoard[x][y] = 0;
+                    } else {
+                        // Continue to live case
+                        if (neighbors["brown"] > neighbors["blue"]) {
+                            nextBoard[x][y] = "brown";
+                        } else if (neighbors["blue"] > neighbors["brown"]) {
+                            nextBoard[x][y] = "blue";
+                        } else {
+                            nextBoard[x][y] = currentBoard[x][y];
+                        }
+                    }
+                } else {
+                    if (b.includes(num_of_neighbors)) {
+                        // Reproduction case
+                        if (neighbors["brown"] > neighbors["blue"]) {
+                            nextBoard[x][y] = "brown";
+                        } else if (neighbors["blue"] > neighbors["brown"]) {
+                            nextBoard[x][y] = "blue";
+                        } else {
+                            nextBoard[x][y] = random() > 0.5 ? "brown" : "blue";
+                        }
+                    } else {
+                        // Continue as dead case
+                        nextBoard[x][y] = currentBoard[x][y] // Which is 0
+                    }
+                }
+            }
+        }
+    
+        // Swap the nextBoard to be the current Board
+        [currentBoard, nextBoard] = [nextBoard, currentBoard];
 }
 
  function mouseDragged() {
