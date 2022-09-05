@@ -24,6 +24,8 @@ let turn = "brown";
 let mouse_drawn = false;
 let custom_on = false;
 let shapes_list_HTML = [];
+let shape;
+let add_icon_counter = 0;
 const shapes = {
     Ship: [
         [0, 1, 1],
@@ -350,48 +352,6 @@ function restart() {
     }    
 }
 
-let sketch = function(p) {
-    p.setup = function() {
-        /*Calculate the number of columns and rows */
-        p.columns = 3;
-        p.rows    = 3;
-        p.unitLength = 30;
-
-        /* Set the canvas to be under the element #canvas*/
-        const p_canvas = p.createCanvas(p.columns * p.unitLength, p.rows * p.unitLength);
-        p_canvas.parent(document.querySelector('#p_canvas'));
-    
-        /*Making both currentBoard and nextBoard 2-dimensional matrix that has (columns * rows) boxes. */
-        p.currentBoard = [];
-        for (let i = 0; i < p.columns; i++) {
-            p.currentBoard[i] = [];
-        }
-
-        for (let i = 0; i < p.columns; i++) {
-            for (let j = 0; j < p.rows; j++) {
-                p.currentBoard[i][j] = 0;
-            }
-        }
-    }
-
-    p.draw = function() {
-        for (let i = 0; i < p.columns; i++) {
-            for (let j = 0; j < p.rows; j++) {
-                if (p.currentBoard[i][j] == 1){
-                    p.fill(red(boxColor), green(boxColor), blue(boxColor));  
-                } else {
-                    p.fill(red(emptyboxColor), green(emptyboxColor), blue(emptyboxColor));
-                } 
-                p.stroke(strokeColor);
-                p.rect(i * p.unitLength, j * p.unitLength, p.unitLength, p.unitLength);
-            }
-        }
-    }
-
-}
-
-let little_canvas = new p5(sketch);
-
 window.onresize = function(){ location.reload(); };
 
 document.querySelector('#reset-game')
@@ -415,8 +375,6 @@ shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-b
 document.querySelector('#add_block .dropdown-menu').innerHTML
     = shapes_list_HTML.join("");
 
-let shape;
-let add_icon_counter = 0;
 const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
 for (let add_shape of add_shapes) {
     add_shape.addEventListener('click', () => {
@@ -528,6 +486,57 @@ color_checkbox.addEventListener('change', () => {
     }
 });
 
+let sketch = function(p) {
+    p.setup = function() {
+        /*Calculate the number of columns and rows */
+        p.col_row = 3;
+        p.unitLength = 30;
+
+        /* Set the canvas to be under the element #canvas*/
+        const p_canvas = p.createCanvas(p.col_row * p.unitLength, p.col_row * p.unitLength);
+        p_canvas.parent(document.querySelector('#p_canvas'));
+    
+        /*Making both currentBoard and nextBoard 2-dimensional matrix that has (columns * rows) boxes. */
+        p.currentBoard = [];
+        for (let i = 0; i < p.col_row; i++) {
+            p.currentBoard[i] = [];
+        }
+
+        for (let i = 0; i < p.col_row; i++) {
+            for (let j = 0; j < p.col_row; j++) {
+                p.currentBoard[i][j] = 0;
+            }
+        }
+    }
+
+    p.draw = function() {
+        for (let i = 0; i < p.col_row; i++) {
+            for (let j = 0; j < p.col_row; j++) {
+                if (p.currentBoard[i][j] == 1){
+                    p.fill(red(boxColor), green(boxColor), blue(boxColor));  
+                } else {
+                    p.fill(red(emptyboxColor), green(emptyboxColor), blue(emptyboxColor));
+                } 
+                p.stroke(strokeColor);
+                p.rect(i * p.unitLength, j * p.unitLength, p.unitLength, p.unitLength);
+            }
+        }
+    }
+
+    p.mousePressed = function() {
+        if (p.mouseX > p.unitLength * p.col_row || p.mouseY > p.unitLength * p.col_row) {
+            return;
+        }
+        p.x = Math.floor(p.mouseX / p.unitLength);
+        p.y = Math.floor(p.mouseY / p.unitLength);
+        console.log(p.x)
+        console.log(p.y)
+        p.currentBoard[p.x][p.y] = p.currentBoard[p.x][p.y] === 1 ? 0 : 1;
+    }
+}
+
+let little_canvas = new p5(sketch);
+
 const custom_on_button = document.querySelector("#custom_list_item");
 custom_on_button.addEventListener('click', () => { custom_on = true; });
 
@@ -536,7 +545,31 @@ custom_close_button.addEventListener('click', () => { setTimeout(() => {
     custom_on = false;
 }, 100); });
 
-const custom_submit_button = document.querySelector("#submit_custom");
-custom_submit_button.addEventListener('click', () => { setTimeout(() => {
-    custom_on = false;
-}, 100); });
+const submit_icon = document.querySelector('#submit_custom');
+submit_icon.addEventListener('click', () => {
+    let new_arr_icon = [];
+    let new_name_icon = document.querySelector('#name_of_newicon').value;
+    for (let i = 0; i < little_canvas.currentBoard.length; i++) {
+        new_arr_icon.push([]);
+        for (let j = 0; j < little_canvas.currentBoard[i].length; j++) {
+            new_arr_icon[i].push(little_canvas.currentBoard[i][j]);
+        }
+    }
+    shapes[new_name_icon] = new_arr_icon;
+
+    if (add_icon_counter > 0) {
+        window.removeEventListener('click', add_icon);
+    }
+    document.querySelector('#add_icons')
+    .innerHTML = new_name_icon;
+    shape = new_name_icon;
+
+    shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" href="#">${new_name_icon}</a></li>`);
+    document.querySelector('#add_block .dropdown-menu').innerHTML = shapes_list_HTML.join("");
+
+    setTimeout(() => {
+        window.addEventListener('click', add_icon);
+        add_icon_counter++;
+        custom_close_button.click();
+    }, 10);
+});

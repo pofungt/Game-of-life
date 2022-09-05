@@ -167,6 +167,12 @@ body {
     margin: 0 0 10px;
 }
 
+#name_of_newicon {
+    margin: 0 0 10px;
+    width: 120px;
+    font-size: 10px;
+}
+
 .modal-footer {
     display: flex;
     justify-content: center;
