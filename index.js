@@ -28,6 +28,7 @@ let shape;
 let add_icon_counter = 0;
 let custom_error_bool = false;
 let over_dropup_bool = false;
+let over_panel_bool = false;
 const custom_error = [
     "No name detected",
     "Letters or numbers only",
@@ -61,7 +62,7 @@ const shapes = {
 
 function setup() {
 	/* Set the canvas to be under the element #canvas*/
-	const canvas = createCanvas(windowWidth - 20, windowHeight - 200);
+	const canvas = createCanvas(windowWidth - 20, windowHeight - 210);
 	canvas.parent(document.querySelector('#canvas'));
 
 	/*Calculate the number of columns and rows */
@@ -259,7 +260,7 @@ function generate_color() {
 }
 
  function mouseDragged() {
-    if (draw_bool && !custom_on) {
+    if (!(!draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
         if (mono) {
             mouse_draw_mono();
         } else {
@@ -270,7 +271,7 @@ function generate_color() {
 }
 
 function mousePressed() {
-    if (draw_bool && !custom_on) {
+    if (!(!draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
         if (mono) {
             mouse_draw_mono();
         } else {
@@ -313,7 +314,7 @@ function add_icon() {
         return;
     }
 
-    if (!draw_bool && !custom_on && !over_dropup_bool) {
+    if (!(draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
         if (mono) {
             add_icon_mono();
         } else {
@@ -675,3 +676,12 @@ icon_size_monitor();
 document.querySelector('#add_block .dropup').addEventListener('mouseenter', () => { over_dropup_bool = true; });
 
 document.querySelector('#add_block .dropup').addEventListener('mouseleave', () => { over_dropup_bool = false; });
+
+function slideToggle(el) {
+    var elem = document.getElementById(el);
+    elem.classList.toggle("open");
+}
+
+document.querySelector('#control_panel').addEventListener('mouseenter', () => { over_panel_bool = true; });
+
+document.querySelector('#control_panel').addEventListener('mouseleave', () => { over_panel_bool = false; });
