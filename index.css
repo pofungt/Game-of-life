@@ -55,8 +55,7 @@ body {
 }
 
 .button_block {
-    padding: 7px;
-    margin: 5px;
+    margin: 0 5px 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -121,3 +120,20 @@ body {
     margin-top: 0;
     padding-top: 0;
 }
+
+.modal-title {
+    font-size: 20px;
+    padding: 5px 0 5px;
+    -webkit-text-stroke: 2px black;
+}
+
+.modal-content {
+    top: 100px;
+    background-image: url(./asset/long_brick.jpg);
+}
+
+.dropup ul {
+    display: none;
+    z-index: 1000;
+    position: fixed!important;
+  }

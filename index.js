@@ -22,7 +22,8 @@ let nextBoard;
 let mono = true;
 let turn = "brown";
 let mouse_drawn = false;
-
+let custom_on = false;
+let shapes_list_HTML = [];
 const shapes = {
     Ship: [
         [0, 1, 1],
@@ -248,7 +249,7 @@ function generate_color() {
 }
 
  function mouseDragged() {
-    if (draw_bool) {
+    if (draw_bool && !custom_on) {
         if (mono) {
             mouse_draw_mono();
         } else {
@@ -259,7 +260,7 @@ function generate_color() {
 }
 
 function mousePressed() {
-    if (draw_bool) {
+    if (draw_bool && !custom_on) {
         if (mono) {
             mouse_draw_mono();
         } else {
@@ -296,7 +297,7 @@ function add_icon() {
         return;
     }
 
-    if (!draw_bool) {
+    if (!draw_bool && !custom_on) {
         if (mono) {
             add_icon_mono();
         } else {
@@ -365,25 +366,30 @@ document.querySelector('#reset-game-random')
 
 // Add list items to add_icon bar
 for (list_name in shapes) {
-    document.querySelector('#add_block .dropdown-menu').innerHTML
-        += `<li><a id="${list_name}" class="dropdown-item" href="#">${list_name}</a></li>`;
+    shapes_list_HTML.push(`<li><a id="${list_name}" class="dropdown-item" href="#">${list_name}</a></li>`);
 }
+shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-bs-toggle="modal"        
+                        data-bs-target="#staticBackdrop" href="#">Custom</a></li>`);
+document.querySelector('#add_block .dropdown-menu').innerHTML
+    = shapes_list_HTML.join("");
 
 let shape;
 let add_icon_counter = 0;
 const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
 for (let add_shape of add_shapes) {
     add_shape.addEventListener('click', () => {
-        if (add_icon_counter > 0) {
-            window.removeEventListener('click', add_icon);
+        if (add_shape.getAttribute('id') !== 'custom_list_item') {
+            if (add_icon_counter > 0) {
+                window.removeEventListener('click', add_icon);
+            }
+            document.querySelector('#add_icons')
+            .innerHTML = add_shape.innerHTML;
+            shape = add_shape.id;
+            setTimeout(() => {
+                window.addEventListener('click', add_icon);
+            }, 10);
+            add_icon_counter++;    
         }
-        document.querySelector('#add_icons')
-        .innerHTML = add_shape.innerHTML;
-        shape = add_shape.id;
-        setTimeout(() => {
-            window.addEventListener('click', add_icon);
-        }, 10);
-        add_icon_counter++;
     });
 };
 
@@ -479,3 +485,16 @@ color_checkbox.addEventListener('change', () => {
     restart();
     }
 });
+
+const custom_on_button = document.querySelector("#custom_list_item");
+custom_on_button.addEventListener('click', () => { custom_on = true; });
+
+const custom_close_button = document.querySelector("#close_custom");
+custom_close_button.addEventListener('click', () => { setTimeout(() => {
+    custom_on = false;
+}, 100); });
+
+const custom_submit_button = document.querySelector("#submit_custom");
+custom_submit_button.addEventListener('click', () => { setTimeout(() => {
+    custom_on = false;
+}, 100); });
