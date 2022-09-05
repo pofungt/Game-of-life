@@ -349,7 +349,7 @@ function restart() {
     }    
 }
 
-window.onresize = function(){ location.reload(); }
+window.onresize = function(){ location.reload(); };
 
 document.querySelector('#reset-game')
 	.addEventListener('click', () => {
