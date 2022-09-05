@@ -350,6 +350,48 @@ function restart() {
     }    
 }
 
+let sketch = function(p) {
+    p.setup = function() {
+        /*Calculate the number of columns and rows */
+        p.columns = 3;
+        p.rows    = 3;
+        p.unitLength = 30;
+
+        /* Set the canvas to be under the element #canvas*/
+        const p_canvas = p.createCanvas(p.columns * p.unitLength, p.rows * p.unitLength);
+        p_canvas.parent(document.querySelector('#p_canvas'));
+    
+        /*Making both currentBoard and nextBoard 2-dimensional matrix that has (columns * rows) boxes. */
+        p.currentBoard = [];
+        for (let i = 0; i < p.columns; i++) {
+            p.currentBoard[i] = [];
+        }
+
+        for (let i = 0; i < p.columns; i++) {
+            for (let j = 0; j < p.rows; j++) {
+                p.currentBoard[i][j] = 0;
+            }
+        }
+    }
+
+    p.draw = function() {
+        for (let i = 0; i < p.columns; i++) {
+            for (let j = 0; j < p.rows; j++) {
+                if (p.currentBoard[i][j] == 1){
+                    p.fill(red(boxColor), green(boxColor), blue(boxColor));  
+                } else {
+                    p.fill(red(emptyboxColor), green(emptyboxColor), blue(emptyboxColor));
+                } 
+                p.stroke(strokeColor);
+                p.rect(i * p.unitLength, j * p.unitLength, p.unitLength, p.unitLength);
+            }
+        }
+    }
+
+}
+
+let little_canvas = new p5(sketch);
+
 window.onresize = function(){ location.reload(); };
 
 document.querySelector('#reset-game')
