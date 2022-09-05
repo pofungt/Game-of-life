@@ -62,7 +62,7 @@ const shapes = {
 
 function setup() {
 	/* Set the canvas to be under the element #canvas*/
-	const canvas = createCanvas(windowWidth - 20, windowHeight - 210);
+	const canvas = createCanvas(windowWidth - 20, windowHeight - 200);
 	canvas.parent(document.querySelector('#canvas'));
 
 	/*Calculate the number of columns and rows */
