@@ -19,7 +19,8 @@ let columns; /* To be determined by window width */
 let rows;    /* To be determined by window height */
 let currentBoard;
 let nextBoard;
-let mono = false;
+let mono = true;
+let turn = "brown";
 
 const shapes = {
     Ship: [
@@ -271,9 +272,22 @@ function add_icon() {
     /**
      * If the mouse coordinate is outside the board
      */
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+     if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
         return;
     }
+
+    if (mono) {
+        add_icon_mono();
+    } else {
+        add_icon_color();
+    }
+
+    if (!draw_bool) {
+        restart();
+    }
+}
+
+function add_icon_mono() {
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     for (let i = 0; i < shapes[shape].length; i++) {
@@ -281,13 +295,18 @@ function add_icon() {
             currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j];
         }
     }
+}
 
-    fill(boxColor);
-    stroke(strokeColor);
-    rect(x * unitLength, y * unitLength, unitLength, unitLength);
-    if (!draw_bool) {
-        restart();
+function add_icon_color() {
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    for (let i = 0; i < shapes[shape].length; i++) {
+        for (let j = 0; j < shapes[shape][i].length; j++) {
+            currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = 
+                shapes[shape][i][j] === 1 ? turn : 0;
+        }
     }
+    turn = turn === "brown" ? "blue" : "brown";
 }
 
 function pause() {
