@@ -26,6 +26,14 @@ let custom_on = false;
 let shapes_list_HTML = [];
 let shape;
 let add_icon_counter = 0;
+let custom_error_bool = false;
+let over_dropup_bool = false;
+const custom_error = [
+    "No name detected",
+    "Letters or numbers only",
+    "Duplicated name",
+    "No pattern detected"
+];
 const shapes = {
     Ship: [
         [0, 1, 1],
@@ -273,6 +281,9 @@ function mousePressed() {
 }
 
 function mouse_draw_mono() {
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+        return;
+    }
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     currentBoard[x][y] = 1;
@@ -282,6 +293,9 @@ function mouse_draw_mono() {
 }
 
 function mouse_draw_color() {
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+        return;
+    }
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     currentBoard[x][y] = turn;
@@ -299,7 +313,7 @@ function add_icon() {
         return;
     }
 
-    if (!draw_bool && !custom_on) {
+    if (!draw_bool && !custom_on && !over_dropup_bool) {
         if (mono) {
             add_icon_mono();
         } else {
@@ -311,6 +325,9 @@ function add_icon() {
 }
 
 function add_icon_mono() {
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+        return;
+    }
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     for (let i = 0; i < shapes[shape].length; i++) {
@@ -321,6 +338,9 @@ function add_icon_mono() {
 }
 
 function add_icon_color() {
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+        return;
+    }
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
     for (let i = 0; i < shapes[shape].length; i++) {
@@ -352,19 +372,23 @@ function restart() {
     }    
 }
 
+// Reload when window size changes
 window.onresize = function(){ location.reload(); };
 
+// Reset board button (Blank)
 document.querySelector('#reset-game')
 	.addEventListener('click', () => {
 		init();
         restart();
 	});
 
+// Reset board button (Random)
 document.querySelector('#reset-game-random')
     .addEventListener('click', () => {
         init_random();
         restart();
     });
+
 
 // Add list items to add_icon bar
 for (list_name in shapes) {
@@ -372,27 +396,35 @@ for (list_name in shapes) {
 }
 shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-bs-toggle="modal"        
                         data-bs-target="#staticBackdrop" href="#">Custom</a></li>`);
-document.querySelector('#add_block .dropdown-menu').innerHTML
+
+// Add event listener for add icon buttons one by one
+function listen_add_icon() {
+    // Add latest pop up list to add icon button
+    document.querySelector('#add_block .dropdown-menu').innerHTML
     = shapes_list_HTML.join("");
 
-const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
-for (let add_shape of add_shapes) {
-    add_shape.addEventListener('click', () => {
-        if (add_shape.getAttribute('id') !== 'custom_list_item') {
-            if (add_icon_counter > 0) {
-                window.removeEventListener('click', add_icon);
+    const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
+    for (let add_shape of add_shapes) {
+        add_shape.addEventListener('click', () => {
+            if (add_shape.getAttribute('id') !== 'custom_list_item') {
+                if (add_icon_counter > 0) {
+                    window.removeEventListener('click', add_icon);
+                }
+                document.querySelector('#add_icons')
+                .innerHTML = add_shape.innerHTML;
+                shape = add_shape.id;
+                setTimeout(() => {
+                    window.addEventListener('click', add_icon);
+                }, 10);
+                add_icon_counter++;    
             }
-            document.querySelector('#add_icons')
-            .innerHTML = add_shape.innerHTML;
-            shape = add_shape.id;
-            setTimeout(() => {
-                window.addEventListener('click', add_icon);
-            }, 10);
-            add_icon_counter++;    
-        }
-    });
-};
+        });
+    };
+}
+// Run once first at start
+listen_add_icon();
 
+// When reset button is pressed again, reset the add icon function to default
 const reset_icon = document.querySelector('#reset_button');
 reset_icon.addEventListener('click', () => {
     document.querySelector('#add_icons')
@@ -402,6 +434,7 @@ reset_icon.addEventListener('click', () => {
     window.removeEventListener('click', add_icon);
 });
 
+// Slider to set frame speed
 const slide_speed_output = ['LOW', 'MED', 'HIGH'];
 const slide = document.querySelector('#framerate_slider');
 slide.addEventListener('change', () => {
@@ -409,6 +442,7 @@ slide.addEventListener('change', () => {
     document.querySelector('#framerate_output').innerHTML = slide_speed_output[parseInt(slide.value)];
 });
 
+// Pay/pause button
 const next_button_pic = ["./asset/pause-button.png", "./asset/play-button.png"];
 const play_pause = document.querySelector('#play_pause');
 play_pause.addEventListener('click', () => {
@@ -419,6 +453,7 @@ play_pause.addEventListener('click', () => {
     }
 });
 
+// Size change switch
 const size_checkbox = document.querySelector("#size_block #flexSwitchCheckChecked");
 size_checkbox.addEventListener('change', () => {
   if (size_checkbox.checked) {
@@ -471,6 +506,7 @@ rules_reset.addEventListener('click', () => {
     S1.value = '3';  
 });
 
+// Color mode switch
 const color_checkbox = document.querySelector("#color_block #color_flexSwitchCheckChecked");
 color_checkbox.addEventListener('change', () => {
   if (color_checkbox.checked) {
@@ -486,12 +522,13 @@ color_checkbox.addEventListener('change', () => {
     }
 });
 
+// Instance mode for p5.js canvas for another canvas in modal
 let sketch = function(p) {
-    p.setup = function() {
-        /*Calculate the number of columns and rows */
-        p.col_row = 3;
-        p.unitLength = 30;
+    /*Calculate the number of columns and rows */
+    p.col_row = 3;
+    p.unitLength = 30;
 
+    p.setup = function() {
         /* Set the canvas to be under the element #canvas*/
         const p_canvas = p.createCanvas(p.col_row * p.unitLength, p.col_row * p.unitLength);
         p_canvas.parent(document.querySelector('#p_canvas'));
@@ -531,43 +568,109 @@ let sketch = function(p) {
         p.y = Math.floor(p.mouseY / p.unitLength);
         p.currentBoard[p.x][p.y] = p.currentBoard[p.x][p.y] === 1 ? 0 : 1;
     }
+
+    p.reset = function() {
+        for (let i = 0; i < p.col_row; i++) {
+            for (let j = 0; j < p.col_row; j++) {
+                p.currentBoard[i][j] = 0;
+            }
+        }
+        document.querySelector('#name_of_newicon').value = "";
+        document.querySelector('.custom_icon_screen #icon_size_button').innerHTML = "Icon Size";
+        p.col_row = 3;
+        p.setup();
+    }
+
 }
 
+// Assign variable to the new canvas
 let little_canvas = new p5(sketch);
 
+// Denote a variable for state of custom add function being activated
 const custom_on_button = document.querySelector("#custom_list_item");
 custom_on_button.addEventListener('click', () => { custom_on = true; });
 
+// Denote a viable for state of custom add function being deactivated
 const custom_close_button = document.querySelector("#close_custom");
 custom_close_button.addEventListener('click', () => { setTimeout(() => {
+    little_canvas.reset();
     custom_on = false;
 }, 100); });
 
+let icon_size = document.querySelector('.custom_icon_screen #icon_size');
+const original_icon_size_HTML = icon_size.innerHTML;
+// When submit button is pressed in custom add mode
 const submit_icon = document.querySelector('#submit_custom');
 submit_icon.addEventListener('click', () => {
+    icon_size.innerHTML = original_icon_size_HTML;
+    // Add a new item in shapes
     let new_arr_icon = [];
     let new_name_icon = document.querySelector('#name_of_newicon').value;
+    let sum_of_cells = 0;
     for (let i = 0; i < little_canvas.currentBoard.length; i++) {
         new_arr_icon.push([]);
         for (let j = 0; j < little_canvas.currentBoard[i].length; j++) {
             new_arr_icon[i].push(little_canvas.currentBoard[i][j]);
+            sum_of_cells += little_canvas.currentBoard[i][j];
         }
     }
-    shapes[new_name_icon] = new_arr_icon;
 
-    if (add_icon_counter > 0) {
-        window.removeEventListener('click', add_icon);
+    if (new_name_icon.length === 0) {
+        icon_size.innerHTML = `<div id="error_message">` + custom_error[0] + `</div>` + original_icon_size_HTML;
+        icon_size_monitor();
+    } else if (!(/^[A-Za-z0-9]*$/.test(new_name_icon))) {
+        icon_size.innerHTML = `<div id="error_message">` + custom_error[1] + `</div>` + original_icon_size_HTML;
+        icon_size_monitor();
+    } else if (Object.keys(shapes).includes(new_name_icon)) {
+        icon_size.innerHTML = `<div id="error_message">` + custom_error[2] + `</div>` + original_icon_size_HTML;
+        icon_size_monitor();
+    } else if (sum_of_cells === 0) {
+        icon_size.innerHTML = `<div id="error_message">` + custom_error[3] + `</div>` + original_icon_size_HTML;
+        icon_size_monitor();
+    } else {
+        shapes[new_name_icon] = new_arr_icon;
+
+        // Change the current add icon shape to the newly added one
+        if (add_icon_counter > 0) {
+            window.removeEventListener('click', add_icon);
+        }
+        document.querySelector('#add_icons')
+        .innerHTML = new_name_icon;
+        shape = new_name_icon;
+    
+        // Add the newly added shape into the shapes object
+        shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" href="#">${new_name_icon}</a></li>`);
+    
+        // Add event listener to enable adding function
+        setTimeout(() => {
+            window.addEventListener('click', add_icon);
+            add_icon_counter++;
+            // Close the modal
+            custom_close_button.click();
+        }, 10);
+    
+        // Add event listener to other original shapes again
+        listen_add_icon();    
     }
-    document.querySelector('#add_icons')
-    .innerHTML = new_name_icon;
-    shape = new_name_icon;
-
-    shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" href="#">${new_name_icon}</a></li>`);
-    document.querySelector('#add_block .dropdown-menu').innerHTML = shapes_list_HTML.join("");
-
-    setTimeout(() => {
-        window.addEventListener('click', add_icon);
-        add_icon_counter++;
-        custom_close_button.click();
-    }, 10);
 });
+
+function icon_size_monitor() {
+    // When size change is set for custom modal canvas
+    const add_icon_size_changes = document.querySelectorAll('.custom_icon_screen .dropdown-item');
+    for (let add_icon_change of add_icon_size_changes) {
+        add_icon_change.addEventListener('click', () => {
+            // Change the variable for col and row
+            document.querySelector('.custom_icon_screen #icon_size_button').innerHTML = add_icon_change.innerHTML;
+            little_canvas.col_row = parseInt(add_icon_change.getAttribute('num'));
+
+            // Reload the canvas
+            little_canvas.setup();
+        });
+    };
+};
+
+icon_size_monitor();
+
+document.querySelector('#add_block .dropup').addEventListener('mouseenter', () => { over_dropup_bool = true; });
+
+document.querySelector('#add_block .dropup').addEventListener('mouseleave', () => { over_dropup_bool = false; });
