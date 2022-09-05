@@ -21,6 +21,7 @@ let currentBoard;
 let nextBoard;
 let mono = true;
 let turn = "brown";
+let mouse_drawn = false;
 
 const shapes = {
     Ship: [
@@ -248,43 +249,62 @@ function generate_color() {
 
  function mouseDragged() {
     if (draw_bool) {
-        const x = Math.floor(mouseX / unitLength);
-        const y = Math.floor(mouseY / unitLength);
-        currentBoard[x][y] = 1;
-        fill(boxColor);
-        stroke(strokeColor);
-        rect(x * unitLength, y * unitLength, unitLength, unitLength);
+        if (mono) {
+            mouse_draw_mono();
+        } else {
+            mouse_draw_color();
+        }
+        mouse_drawn = true;
     }
 }
 
 function mousePressed() {
     if (draw_bool) {
-        const x = Math.floor(mouseX / unitLength);
-        const y = Math.floor(mouseY / unitLength);
-        currentBoard[x][y] = 1;
-        fill(boxColor);
-        stroke(strokeColor);
-        rect(x * unitLength, y * unitLength, unitLength, unitLength);
+        if (mono) {
+            mouse_draw_mono();
+        } else {
+            mouse_draw_color();
+        }
+        mouse_drawn = true;
     }
+}
+
+function mouse_draw_mono() {
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    currentBoard[x][y] = 1;
+    fill(boxColor);
+    stroke(strokeColor);
+    rect(x * unitLength, y * unitLength, unitLength, unitLength);
+}
+
+function mouse_draw_color() {
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    currentBoard[x][y] = turn;
+    const mouse_color = turn === "brown" ? boxColor : boxColor_blue;
+    fill(mouse_color);
+    stroke(strokeColor);
+    rect(x * unitLength, y * unitLength, unitLength, unitLength);
 }
 
 function add_icon() {
     /**
      * If the mouse coordinate is outside the board
      */
-     if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
         return;
     }
 
-    if (mono) {
-        add_icon_mono();
-    } else {
-        add_icon_color();
-    }
-
     if (!draw_bool) {
+        if (mono) {
+            add_icon_mono();
+        } else {
+            add_icon_color();
+        }
         restart();
     }
+
 }
 
 function add_icon_mono() {
@@ -321,6 +341,10 @@ function restart() {
         document.querySelector('#play_pause img').src = next_button_pic[0];
         draw_pen.removeAttribute('style');
         draw_bool = false;
+        if (mouse_drawn) {
+            turn = turn === "brown" ? "blue" : "brown";
+            mouse_drawn = false;
+        }
         loop();
     }    
 }
@@ -411,10 +435,10 @@ draw_pen.addEventListener('click', () => {
     if (!draw_bool) {
         draw_pen.style.background = "radial-gradient(#382D17, #9e7f3f)";
         pause();
+        draw_bool = true;
     } else {
         restart();
     }
-    draw_bool = !draw_bool;
 });
 
 // When new rules are submitted
@@ -439,3 +463,17 @@ rules_reset.addEventListener('click', () => {
     S1.value = '3';  
 });
 
+const color_checkbox = document.querySelector("#color_block #color_flexSwitchCheckChecked");
+color_checkbox.addEventListener('change', () => {
+  if (color_checkbox.checked) {
+    mono = true;
+    document.querySelector('#color_block label').innerHTML = "Mono";
+    setup();
+    restart();
+  } else {
+    mono = false;
+    document.querySelector('#color_block label').innerHTML = "Color";
+    setup();
+    restart();
+    }
+});
