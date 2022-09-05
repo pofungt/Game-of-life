@@ -529,8 +529,6 @@ let sketch = function(p) {
         }
         p.x = Math.floor(p.mouseX / p.unitLength);
         p.y = Math.floor(p.mouseY / p.unitLength);
-        console.log(p.x)
-        console.log(p.y)
         p.currentBoard[p.x][p.y] = p.currentBoard[p.x][p.y] === 1 ? 0 : 1;
     }
 }
