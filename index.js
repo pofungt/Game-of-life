@@ -640,7 +640,6 @@ submit_icon.addEventListener('click', () => {
     
         // Add the newly added shape into the shapes object
         shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" href="#">${new_name_icon}</a></li>`);
-    
         // Add event listener to enable adding function
         setTimeout(() => {
             window.addEventListener('click', add_icon);
@@ -648,9 +647,11 @@ submit_icon.addEventListener('click', () => {
             // Close the modal
             custom_close_button.click();
         }, 10);
-    
+
         // Add event listener to other original shapes again
         listen_add_icon();    
+
+        document.querySelector('#custom_list_item').addEventListener('click', () => { custom_on = true; });
     }
 });
 
