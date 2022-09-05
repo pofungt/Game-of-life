@@ -50,7 +50,8 @@ body {
 
 #control_panel {
     padding: 5px;
-    min-height: 100px;
+    height: 100px;
+    overflow-y: auto;
 }
 
 .button_block {
