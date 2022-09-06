@@ -1,11 +1,32 @@
 body {
     background-color: #000000;
+    color: #ffffff;
+    font-family: 'Space';
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .landing {
+    width: 95vw;
+    height: 80vh;
+    border: 2px solid white;
+    padding: 5px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+  }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 10px;
   }
   .wrapper {
-    border: 1px solid #ffffff;
-    height: 300px;
-    width: 300px;
-    position: absolute;
+    position: relative;
     margin: auto;
     left: 0;
     right: 0;
@@ -20,17 +41,19 @@ body {
     align-items: center;
     perspective: 800px;
     perspective-origin: 50%;
+    transform: translateY(-40px);
   }
   .image-cube {
-    width: 300px;
-    height: 300px;
+    width: 200px;
+    height: 200px;
     transform-style: preserve-3d;
     position: relative;
     transition: 2s;
+    top: 50px;
   }
   .image-cube div {
-    height: 300px;
-    width: 300px;
+    height: 200px;
+    width: 200px;
     position: absolute;
   }
   img {
@@ -38,30 +61,76 @@ body {
     transform: translateZ(0);
   }
   .front {
-    transform: translateZ(150px);
+    transform: translateZ(100px);
   }
   .right {
-    transform: rotateY(-270deg) translateX(150px);
+    transform: rotateY(-270deg) translateX(100px);
     transform-origin: 100% 0;
   }
   .back {
-    transform: translateZ(-150px) rotateY(180deg);
+    transform: translateZ(-100px) rotateY(180deg);
   }
   .left {
-    transform: rotateY(270deg) translateX(-150px);
+    transform: rotateY(270deg) translateX(-100px);
     transform-origin: 0 50%;
   }
   .btns {
-    margin-top: 80px;
+    margin-top: 100px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    transform: translateY(-50px);
   }
   .btns button {
     background-color: transparent;
     color: #ffffff;
-    border: 3px solid #ffffff;
-    padding: 8px 40px;
-    border-radius: 30px;
+    border: 1px solid #ffffff;
+    padding: 5px 20px;
     font-size: 20px;
     cursor: pointer;
+  }
+
+  @font-face {
+    font-family: Space;
+    src: url('./asset/Space-Notorious-rounded.otf')
+  }
+
+  .name {
+    font-size: 50px;
+  }
+
+  .contact {
+    font-size: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .contact i {
+    margin: 0 5px 0;
+  }
+
+  .position {
+    font-size: 40px;
+    transform: translateY(-60px);
+  }
+
+  .navbox {
+    padding: 5px;
+    border: 2px solid white;
+    position: sticky;
+    top: 0;
+    font-size: 25px;
+    z-index: 1000;
+  }
+
+  .intro {
+    width: 98%;
+    height: 1000px;
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+  }
+
+  p {
+    font-size: 20px;
   }
