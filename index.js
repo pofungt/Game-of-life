@@ -30,6 +30,7 @@ let custom_error_bool = false;
 let over_dropup_bool = false;
 let over_panel_bool = false;
 let drawBool = false;
+let addIconBool = false;
 const custom_error = [
     "No name detected",
     "Letters or numbers only",
@@ -79,6 +80,7 @@ function setup() {
     }
 	// Now both currentBoard and nextBoard are array of array of undefined values.
 	init();  // Set the initial values of the currentBoard and nextBoard
+    updatePopUpMenu();
 }
 
 function init() {
@@ -299,6 +301,9 @@ function mouseDraw() {
 
 function mousePressed() {
     mouseDraw();
+    if (addIconBool) {
+        addIcon();
+    }
 }
 
 function addIcon() {
@@ -347,6 +352,33 @@ function restart() {
     }    
 }
 
+function updatePopUpMenu() {
+    // Empty the HTML list
+    shapes_list_HTML = [];
+    // Add list items to add_icon bar
+    for (list_name in shapes) {
+        shapes_list_HTML.push(`<li><a id="${list_name}" class="shapePopUp dropdown-item" href="#">${list_name}</a></li>`);
+    }
+    shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-bs-toggle="modal"        
+                            data-bs-target="#staticBackdrop" href="#">Custom</a></li>`);
+    // Update the HTML in the dropup menu of "Add"
+    document.querySelector('#add_block .dropdown-menu').innerHTML = shapes_list_HTML.join("");
+
+    // Monitor if the pattern buttons are clicked, if clicked, update the {shape} to that particular shape, and activate the addIcon function
+    const add_shapes = document.querySelectorAll('#add_block .shapePopUp');
+    for (let add_shape of add_shapes) {
+        add_shape.addEventListener('click', () => { 
+            addIconBool = true;
+            shape = add_shape.id;
+            document.querySelector('#add_icons').innerHTML = shape;
+        });
+    }
+
+    // Denote a variable for state of custom add function being activated
+    const custom_on_button = document.querySelector("#custom_list_item");
+    custom_on_button.addEventListener('click', () => { custom_on = true; });
+}
+
 // Reload when window size changes
 window.onresize = function(){
     setup();
@@ -365,45 +397,12 @@ document.querySelector('#reset-game-random').addEventListener('click', () => {
         restart();
     });
 
-
-// Add list items to add_icon bar
-for (list_name in shapes) {
-    shapes_list_HTML.push(`<li><a id="${list_name}" class="dropdown-item" href="#">${list_name}</a></li>`);
-}
-shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-bs-toggle="modal"        
-                        data-bs-target="#staticBackdrop" href="#">Custom</a></li>`);
-
-// Add event listener for add icon buttons one by one
-function listen_add_icon() {
-    // Add latest pop up list to add icon button
-    document.querySelector('#add_block .dropdown-menu').innerHTML = shapes_list_HTML.join("");
-
-    const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
-    for (let add_shape of add_shapes) {
-        add_shape.addEventListener('click', () => {
-            if (add_shape.getAttribute('id') !== 'custom_list_item') {
-                if (add_icon_counter > 0) {
-                    window.removeEventListener('click', addIcon);
-                }
-                document.querySelector('#add_icons')
-                .innerHTML = add_shape.innerHTML;
-                shape = add_shape.id;
-                setTimeout(() => {
-                    window.addEventListener('click', addIcon);
-                }, 10);
-                add_icon_counter++;    
-            }
-        });
-    };
-}
-// Run once first at start
-listen_add_icon();
-
-// When reset button is pressed again, reset the add icon function to default
+// When reset button is pressed again, reset the add icon function to default, also disable the add icon function when mouse is clicked
 const reset_icon = document.querySelector('#reset_button');
 reset_icon.addEventListener('click', () => {
     document.querySelector('#add_icons').innerHTML = "Add";
     shape = null;
+    addIconBool = false;
 });
 
 // Slider to set frame speed
@@ -550,15 +549,10 @@ let sketch = function(p) {
         p.col_row = 3;
         p.setup();
     }
-
 }
 
 // Assign variable to the new canvas
 let little_canvas = new p5(sketch);
-
-// Denote a variable for state of custom add function being activated
-const custom_on_button = document.querySelector("#custom_list_item");
-custom_on_button.addEventListener('click', () => { custom_on = true; });
 
 // Denote a viable for state of custom add function being deactivated
 const custom_close_button = document.querySelector("#close_custom");
@@ -569,9 +563,10 @@ custom_close_button.addEventListener('click', () => { setTimeout(() => {
 
 let icon_size = document.querySelector('.custom_icon_screen #icon_size');
 const original_icon_size_HTML = icon_size.innerHTML;
+
 // When submit button is pressed in custom add mode
-const submit_icon = document.querySelector('#submit_custom');
-submit_icon.addEventListener('click', () => {
+const submitIcon = document.querySelector('#submit_custom');
+submitIcon.addEventListener('click', () => {
     icon_size.innerHTML = original_icon_size_HTML;
     // Add a new item in shapes
     let new_arr_icon = [];
@@ -585,44 +580,38 @@ submit_icon.addEventListener('click', () => {
         }
     }
 
+    // Error messages
     if (new_name_icon.length === 0) {
         icon_size.innerHTML = `<div id="error_message">` + custom_error[0] + `</div>` + original_icon_size_HTML;
         icon_size_monitor();
+        return;
     } else if (!(/^[A-Za-z0-9]*$/.test(new_name_icon))) {
         icon_size.innerHTML = `<div id="error_message">` + custom_error[1] + `</div>` + original_icon_size_HTML;
         icon_size_monitor();
+        return;
     } else if (Object.keys(shapes).includes(new_name_icon)) {
         icon_size.innerHTML = `<div id="error_message">` + custom_error[2] + `</div>` + original_icon_size_HTML;
         icon_size_monitor();
+        return;
     } else if (sum_of_cells === 0) {
         icon_size.innerHTML = `<div id="error_message">` + custom_error[3] + `</div>` + original_icon_size_HTML;
         icon_size_monitor();
-    } else {
-        shapes[new_name_icon] = new_arr_icon;
-
-        // Change the current add icon shape to the newly added one
-        if (add_icon_counter > 0) {
-            window.removeEventListener('click', addIcon);
-        }
-        document.querySelector('#add_icons')
-        .innerHTML = new_name_icon;
-        shape = new_name_icon;
-    
-        // Add the newly added shape into the shapes object
-        shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" href="#">${new_name_icon}</a></li>`);
-        // Add event listener to enable adding function
-        setTimeout(() => {
-            window.addEventListener('click', addIcon);
-            add_icon_counter++;
-            // Close the modal
-            custom_close_button.click();
-        }, 10);
-
-        // Add event listener to other original shapes again
-        listen_add_icon();    
-
-        document.querySelector('#custom_list_item').addEventListener('click', () => { custom_on = true; });
+        return;
     }
+
+    // Proceeds the below when no errors occurred
+    // Add the new shape into shapes array
+    shapes[new_name_icon] = new_arr_icon;
+    document.querySelector('#add_icons').innerHTML = new_name_icon;
+    shape = new_name_icon;
+    // Add the newly added shape into the shapes object
+    shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" href="#">${new_name_icon}</a></li>`);
+    // Update the HTML tags in the popup menu of Add button
+    updatePopUpMenu();
+    // Allow add icon function
+    addIconBool = true;
+    // Close the custom window
+    custom_close_button.click();
 });
 
 function icon_size_monitor() {
