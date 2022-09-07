@@ -259,102 +259,75 @@ function generate_color() {
         [currentBoard, nextBoard] = [nextBoard, currentBoard];
 }
 
+function checkOutsideCanvas() {
+    return mouseX > unitLength * columns || mouseY > unitLength * rows || mouseX < 0 || mouseY < 0;
+}
+
+function allowDrawingBoolean() {
+    return !(custom_on || over_dropup_bool || over_panel_bool);
+}
+
+function mouseDraw() {
+    if (checkOutsideCanvas()) { return; }
+
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    // In monotone mode
+    if (mono) {
+        // Add 1 to the currentBoard
+        currentBoard[x][y] = 1;
+        // Immediately show the effect of the added blocks
+        fill(boxColor);
+    // In color mode
+    } else {
+        // Add the turn's color to the currentBoard
+        currentBoard[x][y] = turn;
+        // Immediately show the effect of the added blocks with the turn's color
+        const mouse_color = turn === "brown" ? boxColor : boxColor_blue;
+        fill(mouse_color);
+    }
+    stroke(strokeColor);
+    rect(x * unitLength, y * unitLength, unitLength, unitLength);
+}
+
  function mouseDragged() {
-    if (!(!draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
-        if (mono) {
-            mouse_draw_mono();
-        } else {
-            mouse_draw_color();
-        }
+    if (draw_bool && allowDrawingBoolean()) {
+        mouseDraw();
         mouse_drawn = true;
     }
 }
 
 function mousePressed() {
-    if (!(!draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
-        if (mono) {
-            mouse_draw_mono();
-        } else {
-            mouse_draw_color();
-        }
+    if (draw_bool && allowDrawingBoolean()) {
+        mouseDraw();
         mouse_drawn = true;
     }
 }
 
-function checkOutsideCanvas() {
-    return mouseX > unitLength * columns || mouseY > unitLength * rows || mouseX < 0 || mouseY < 0;
-}
+function addIcon() {
+    if (checkOutsideCanvas()) { return; }
 
-function mouse_draw_mono() {
-    if (checkOutsideCanvas()) {
-        return;
-    }
-    const x = Math.floor(mouseX / unitLength);
-    const y = Math.floor(mouseY / unitLength);
-    currentBoard[x][y] = 1;
-    fill(boxColor);
-    stroke(strokeColor);
-    rect(x * unitLength, y * unitLength, unitLength, unitLength);
-}
-
-function mouse_draw_color() {
-    if (checkOutsideCanvas()) {
-        return;
-    }
-    const x = Math.floor(mouseX / unitLength);
-    const y = Math.floor(mouseY / unitLength);
-    currentBoard[x][y] = turn;
-    const mouse_color = turn === "brown" ? boxColor : boxColor_blue;
-    fill(mouse_color);
-    stroke(strokeColor);
-    rect(x * unitLength, y * unitLength, unitLength, unitLength);
-}
-
-function add_icon() {
-    /**
-     * If the mouse coordinate is outside the board
-     */
-    if (checkOutsideCanvas()) {
-        return;
-    }
-
-    if (!(draw_bool || custom_on || over_dropup_bool || over_panel_bool)) {
-        if (mono) {
-            add_icon_mono();
-        } else {
-            add_icon_color();
+    if (!draw_bool && allowDrawingBoolean()) {
+        const x = Math.floor(mouseX / unitLength);
+        const y = Math.floor(mouseY / unitLength);
+        for (let i = 0; i < shapes[shape].length; i++) {
+            for (let j = 0; j < shapes[shape][i].length; j++) {
+                // In mono mode, just plug in '1's in the currentBoard
+                if (mono) {
+                    currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j];
+                // In color mode, plug in the turn's color in the currentBoard
+                } else {
+                    currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j] === 1 ? turn : 0;
+                }
+            }
+        }
+        // Switch color turn when color mode on
+        if (!mono) {
+            turn = turn === "brown" ? "blue" : "brown";
         }
         restart();
     }
 
-}
-
-function add_icon_mono() {
-    if (checkOutsideCanvas()) {
-        return;
-    }
-    const x = Math.floor(mouseX / unitLength);
-    const y = Math.floor(mouseY / unitLength);
-    for (let i = 0; i < shapes[shape].length; i++) {
-        for (let j = 0; j < shapes[shape][i].length; j++) {
-            currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j];
-        }
-    }
-}
-
-function add_icon_color() {
-    if (checkOutsideCanvas()) {
-        return;
-    }
-    const x = Math.floor(mouseX / unitLength);
-    const y = Math.floor(mouseY / unitLength);
-    for (let i = 0; i < shapes[shape].length; i++) {
-        for (let j = 0; j < shapes[shape][i].length; j++) {
-            currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = 
-                shapes[shape][i][j] === 1 ? turn : 0;
-        }
-    }
-    turn = turn === "brown" ? "blue" : "brown";
 }
 
 function pause() {
@@ -369,6 +342,7 @@ function restart() {
         document.querySelector('#play_pause img').src = next_button_pic[0];
         draw_pen.removeAttribute('style');
         draw_bool = false;
+        // Check if anything is drawn with mouse, if yes switch the color turn, if not remain the same color
         if (mouse_drawn) {
             turn = turn === "brown" ? "blue" : "brown";
             mouse_drawn = false;
@@ -384,15 +358,13 @@ window.onresize = function(){
 };
 
 // Reset board button (Blank)
-document.querySelector('#reset-game')
-	.addEventListener('click', () => {
+document.querySelector('#reset-game').addEventListener('click', () => {
 		init();
         restart();
 	});
 
 // Reset board button (Random)
-document.querySelector('#reset-game-random')
-    .addEventListener('click', () => {
+document.querySelector('#reset-game-random').addEventListener('click', () => {
         init_random();
         restart();
     });
@@ -408,21 +380,20 @@ shapes_list_HTML.push(`<li><a id="custom_list_item" class="dropdown-item" data-b
 // Add event listener for add icon buttons one by one
 function listen_add_icon() {
     // Add latest pop up list to add icon button
-    document.querySelector('#add_block .dropdown-menu').innerHTML
-    = shapes_list_HTML.join("");
+    document.querySelector('#add_block .dropdown-menu').innerHTML = shapes_list_HTML.join("");
 
     const add_shapes = document.querySelectorAll('#add_block .dropdown-item');
     for (let add_shape of add_shapes) {
         add_shape.addEventListener('click', () => {
             if (add_shape.getAttribute('id') !== 'custom_list_item') {
                 if (add_icon_counter > 0) {
-                    window.removeEventListener('click', add_icon);
+                    window.removeEventListener('click', addIcon);
                 }
                 document.querySelector('#add_icons')
                 .innerHTML = add_shape.innerHTML;
                 shape = add_shape.id;
                 setTimeout(() => {
-                    window.addEventListener('click', add_icon);
+                    window.addEventListener('click', addIcon);
                 }, 10);
                 add_icon_counter++;    
             }
@@ -435,11 +406,10 @@ listen_add_icon();
 // When reset button is pressed again, reset the add icon function to default
 const reset_icon = document.querySelector('#reset_button');
 reset_icon.addEventListener('click', () => {
-    document.querySelector('#add_icons')
-        .innerHTML = "Add";
+    document.querySelector('#add_icons').innerHTML = "Add";
     shape = null;
     add_icon_counter = 0;
-    window.removeEventListener('click', add_icon);
+    window.removeEventListener('click', addIcon);
 });
 
 // Slider to set frame speed
@@ -640,7 +610,7 @@ submit_icon.addEventListener('click', () => {
 
         // Change the current add icon shape to the newly added one
         if (add_icon_counter > 0) {
-            window.removeEventListener('click', add_icon);
+            window.removeEventListener('click', addIcon);
         }
         document.querySelector('#add_icons')
         .innerHTML = new_name_icon;
@@ -650,7 +620,7 @@ submit_icon.addEventListener('click', () => {
         shapes_list_HTML.splice((shapes_list_HTML.length - 1),0 , `<li><a id="${new_name_icon}" class="dropdown-item" href="#">${new_name_icon}</a></li>`);
         // Add event listener to enable adding function
         setTimeout(() => {
-            window.addEventListener('click', add_icon);
+            window.addEventListener('click', addIcon);
             add_icon_counter++;
             // Close the modal
             custom_close_button.click();
