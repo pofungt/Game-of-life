@@ -21,14 +21,15 @@ let currentBoard;
 let nextBoard;
 let mono = true;
 let turn = "brown";
-let mouse_drawn = false;
-let custom_on = false;
 let shapes_list_HTML = [];
 let shape;
 let add_icon_counter = 0;
+let mouse_drawn = false;
+let custom_on = false;
 let custom_error_bool = false;
 let over_dropup_bool = false;
 let over_panel_bool = false;
+let drawBool = false;
 const custom_error = [
     "No name detected",
     "Letters or numbers only",
@@ -268,7 +269,7 @@ function allowDrawingBoolean() {
 }
 
 function mouseDraw() {
-    if (checkOutsideCanvas()) { return; }
+    if (!drawBool || !allowDrawingBoolean() || checkOutsideCanvas()) { return; }
 
     const x = Math.floor(mouseX / unitLength);
     const y = Math.floor(mouseY / unitLength);
@@ -288,28 +289,24 @@ function mouseDraw() {
     }
     stroke(strokeColor);
     rect(x * unitLength, y * unitLength, unitLength, unitLength);
+
+    mouse_drawn = true;
 }
 
  function mouseDragged() {
-    if (draw_bool && allowDrawingBoolean()) {
-        mouseDraw();
-        mouse_drawn = true;
-    }
+    mouseDraw();
 }
 
 function mousePressed() {
-    if (draw_bool && allowDrawingBoolean()) {
-        mouseDraw();
-        mouse_drawn = true;
-    }
+    mouseDraw();
 }
 
 function addIcon() {
-    if (checkOutsideCanvas()) { return; }
+    if (drawBool || !allowDrawingBoolean() || checkOutsideCanvas()) { return; }
 
-    if (!draw_bool && allowDrawingBoolean()) {
-        const x = Math.floor(mouseX / unitLength);
-        const y = Math.floor(mouseY / unitLength);
+    const x = Math.floor(mouseX / unitLength);
+    const y = Math.floor(mouseY / unitLength);
+    if (shape !== null) {
         for (let i = 0; i < shapes[shape].length; i++) {
             for (let j = 0; j < shapes[shape][i].length; j++) {
                 // In mono mode, just plug in '1's in the currentBoard
@@ -320,14 +317,13 @@ function addIcon() {
                     currentBoard[(x + i + columns) % columns][(y + j + rows) % rows] = shapes[shape][i][j] === 1 ? turn : 0;
                 }
             }
-        }
-        // Switch color turn when color mode on
-        if (!mono) {
-            turn = turn === "brown" ? "blue" : "brown";
-        }
-        restart();
+        }    
     }
-
+    // Switch color turn when color mode on
+    if (!mono) {
+        turn = turn === "brown" ? "blue" : "brown";
+    }
+    restart();
 }
 
 function pause() {
@@ -341,7 +337,7 @@ function restart() {
     if (!isLooping()) {
         document.querySelector('#play_pause img').src = next_button_pic[0];
         draw_pen.removeAttribute('style');
-        draw_bool = false;
+        drawBool = false;
         // Check if anything is drawn with mouse, if yes switch the color turn, if not remain the same color
         if (mouse_drawn) {
             turn = turn === "brown" ? "blue" : "brown";
@@ -408,8 +404,6 @@ const reset_icon = document.querySelector('#reset_button');
 reset_icon.addEventListener('click', () => {
     document.querySelector('#add_icons').innerHTML = "Add";
     shape = null;
-    add_icon_counter = 0;
-    window.removeEventListener('click', addIcon);
 });
 
 // Slider to set frame speed
@@ -449,14 +443,12 @@ size_checkbox.addEventListener('change', () => {
     }
 });
 
-// When draw is clicked, either to enable or disable drawing
-let draw_bool = false;
 const draw_pen = document.querySelector('#draw_pen');
 draw_pen.addEventListener('click', () => {
-    if (!draw_bool) {
+    if (!drawBool) {
         draw_pen.style.background = "radial-gradient(#382D17, #9e7f3f)";
         pause();
-        draw_bool = true;
+        drawBool = true;
     } else {
         restart();
     }
