@@ -281,8 +281,12 @@ function mousePressed() {
     }
 }
 
+function checkOutsideCanvas() {
+    return mouseX > unitLength * columns || mouseY > unitLength * rows || mouseX < 0 || mouseY < 0;
+}
+
 function mouse_draw_mono() {
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (checkOutsideCanvas()) {
         return;
     }
     const x = Math.floor(mouseX / unitLength);
@@ -294,7 +298,7 @@ function mouse_draw_mono() {
 }
 
 function mouse_draw_color() {
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (checkOutsideCanvas()) {
         return;
     }
     const x = Math.floor(mouseX / unitLength);
@@ -310,7 +314,7 @@ function add_icon() {
     /**
      * If the mouse coordinate is outside the board
      */
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (checkOutsideCanvas()) {
         return;
     }
 
@@ -326,7 +330,7 @@ function add_icon() {
 }
 
 function add_icon_mono() {
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (checkOutsideCanvas()) {
         return;
     }
     const x = Math.floor(mouseX / unitLength);
@@ -339,7 +343,7 @@ function add_icon_mono() {
 }
 
 function add_icon_color() {
-    if (mouseX > unitLength * columns || mouseY > unitLength * rows) {
+    if (checkOutsideCanvas()) {
         return;
     }
     const x = Math.floor(mouseX / unitLength);
@@ -374,7 +378,10 @@ function restart() {
 }
 
 // Reload when window size changes
-window.onresize = function(){ location.reload(); };
+window.onresize = function(){
+    setup();
+    restart();
+};
 
 // Reset board button (Blank)
 document.querySelector('#reset-game')
