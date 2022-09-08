@@ -38,28 +38,18 @@ const custom_error = [
     "No pattern detected"
 ];
 const shapes = {
-    Ship: [
-        [0, 1, 1],
-        [1, 0, 1],
-        [1, 1, 0]
-    ],
-    Glider: [
-        [1, 1, 1],
-        [1, 0, 0],
-        [0, 1, 0]
-    ],
-    Spaceship: [
-        [0, 1, 0, 0, 1],
-        [1, 0, 0, 0, 0],
-        [1, 0, 0, 0, 1],
-        [1, 1, 1, 1, 0]
-    ],
-    Toad: [
-        [0, 0, 1, 0],
-        [1, 0, 0, 1],
-        [1, 0, 0, 1],
-        [0, 1, 0, 0]
-    ]
+    Ship: `OO
+    O.O
+    .OO`,
+    Glider: `.O
+    ..O
+    OOO`,
+    Spaceship: `.O..O
+    O
+    O...O
+    OOOO`,
+    Toad: `.OOO
+    OOO`,
 }
 
 function setup() {
@@ -377,6 +367,22 @@ function updatePopUpMenu() {
     // Denote a variable for state of custom add function being activated
     const custom_on_button = document.querySelector("#custom_list_item");
     custom_on_button.addEventListener('click', () => { custom_on = true; });
+}
+
+function cellConvertArray(pattern) {
+    let tempArray = pattern.split("\n");
+    let outputArray = [];
+    for (line of tempArray) {
+        outputArray.push(line.trim().replace(/\./g, 0).replace(/O/g, 1).split("")
+                            .map(x => { return parseInt(x); }));
+    }
+    return outputArray;
+}
+
+// Convert .cell patterns into arrays to process
+for (key in shapes) {
+    console.log(shapes[key])
+    shapes[key] = cellConvertArray(shapes[key]);
 }
 
 // Reload when window size changes
