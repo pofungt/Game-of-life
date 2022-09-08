@@ -37,7 +37,7 @@ const custom_error = [
     "Duplicated name",
     "No pattern detected"
 ];
-const shapes = {
+/* const shapes = {
     Ship: `OO
     O.O
     .OO`,
@@ -50,6 +50,12 @@ const shapes = {
     OOOO`,
     Toad: `.OOO
     OOO`,
+} */
+const shapes = {
+    Ship: "2ob$obo$b2o!",
+    Glider: "bob$2bo$3o!",
+    Spaceship: "bo2bo$o4b$o3bo$4o!",
+    Toad: "b3o$3o!",
 }
 
 function setup() {
@@ -379,10 +385,24 @@ function cellConvertArray(pattern) {
     return outputArray;
 }
 
-// Convert .cell patterns into arrays to process
+function rleConvertArray(pattern) {
+    let tempArr = pattern.replace('!', '').split('$');
+    let finalArr = [];
+    for (line of tempArr) {
+        finalArr.push(line.replace(/\d(b|o)/g, (match) => { return match.charAt(1).repeat(match.charAt(0)) })
+                        .replace('!', '')
+                        .replaceAll('o', '1')
+                        .replaceAll('b', '0')
+                        .split('')
+                        .map(x => { return parseInt(x) }));
+    }
+    return finalArr;
+}
+
+// Convert .rle patterns into arrays to process
 for (key in shapes) {
     console.log(shapes[key])
-    shapes[key] = cellConvertArray(shapes[key]);
+    shapes[key] = rleConvertArray(shapes[key]);
 }
 
 // Reload when window size changes
