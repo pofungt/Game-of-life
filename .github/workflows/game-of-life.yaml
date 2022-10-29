@@ -19,6 +19,6 @@ jobs:
             git pull origin main
             yarn install
             forever restart -c "yarn start" .
-          host: duncantang.dev
+          host: gameoflife.duncantang.dev
           user: ubuntu
           key: ${{secrets.SSH_PRIVATE_KEY}}
