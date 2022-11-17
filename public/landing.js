@@ -14,14 +14,18 @@ btnPrev.addEventListener("click", () => {
 });
 
 setInterval(() => {
-    btnNext.click();
+  btnNext.click();
 }, 4000);
 
-document.body.onkeydown = function(e) {
-    if (e.key == " " ||
-    e.code == "Space" ||      
+document.body.onkeydown = function (e) {
+  if (e.key == " " ||
+    e.code == "Space" ||
     e.keyCode == 32 && e.target == document.body) {
-        e.preventDefault();
-        window.location = "./index.html";
-    }
+    e.preventDefault();
+    window.location = "./index.html";
   }
+}
+
+document.querySelector('.navbox').addEventListener('click', ()=>{
+  window.location = "./index.html";
+})
